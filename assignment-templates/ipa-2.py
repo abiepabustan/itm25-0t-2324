@@ -40,12 +40,9 @@ def shift_letter(letter, shift):
     if letter == " ":
         return " "
 
-    letter_value = ord("A")
-    total_letters = 26
-
-    letter_code = ord(letter) - letter_value
-    shift_code = (letter_code + shift) % total_letters
-    shift_letter = chr(shift_code + letter_value)
+    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    shift_index = (alphabet.index(letter) + shift) % len(alphabet)
+    shift_letter = alphabet[shift_index]
 
     return shift_letter
 
@@ -75,19 +72,22 @@ def caesar_cipher(message, shift):
     '''
     # Replace `pass` with your code.
     # Stay within the function. Only use the parameters as input. The function should return your answer.
+    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     caesar_cipher = ""
+
     for character in message:
         if character.isalpha():
-            if character.isupper():
-                character_value = ord('A')
-            else:
-                character_value = ord('a')
+            is_uppercase = character.isupper()
+            character_index = alphabet.index(character.upper())
+            shifted_index = (character_index + shift) % 26
+            shifted_character = alphabet[shifted_index]
 
-            shift_character = chr((ord(character) - character_value + shift) % 26 + character_value)
+            if not is_uppercase:
+                shifted_character = shifted_character.lower()
         else:
-            shift_character = character
+            shifted_character = character
 
-        caesar_cipher += shift_character
+        caesar_cipher += shifted_character
 
     return caesar_cipher
 
@@ -128,9 +128,12 @@ def shift_by_letter(letter, letter_shift):
         return " "
 
     alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    shift_amount = alphabet.index(letter_shift)
-    shifted_index = (alphabet.index(letter) + shift_amount) % 26
-    shift_by_letter = alphabet[shifted_index]
+    shift_amount = alphabet.index(letter_shift.upper())
+    shift_index = (alphabet.index(letter.upper()) + shift_amount) % 26
+    shift_by_letter = alphabet[shift_index]
+
+    if letter.islower():
+        shift_by_letter = shift_by_letter.lower()
 
     return shift_by_letter
 
@@ -244,9 +247,10 @@ def scytale_cipher(message, shift):
     if len(message) % shift != 0:
         message += '_' * (shift - (len(message) % shift))
 
-    scytale_cipher = ''
-    for i in range(len(message)):
-        scytale_cipher += message[(i // shift) + (len(message) // shift) * (i % shift)]
+    scytale_cipher = ''.join(
+        message[(i // shift) + (len(message) // shift) * (i % shift)]
+        for i in range(len(message))
+    )
 
     return scytale_cipher
 
@@ -282,17 +286,12 @@ def scytale_decipher(message, shift):
     # Replace `pass` with your code.
     # Stay within the function. Only use the parameters as input. The function should return your answer.
     num_rows = len(message) // shift
+    num_cols = shift
 
-    grid = [[''] * shift for _ in range(num_rows)]
-
-    index = 0
-    for row in range(num_rows):
-        for col in range(shift):
-            grid[row][col] = message[index]
-            index += 1
+    grid = [message[i:i+num_cols] for i in range(0, len(message), num_cols)]
 
     scytale_decipher = ''
-    for col in range(shift):
+    for col in range(num_cols):
         for row in range(num_rows):
             scytale_decipher += grid[row][col]
 
